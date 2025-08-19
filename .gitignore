@@ -1,0 +1,25 @@
+﻿# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE (PyCharm)
+.idea/
+*.iml
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs
+logs/
+*.log
+
+# Selenium drivers
+chromedriver*
+geckodriver*
+*.exe
+
+# System files
+.DS_Store
+Thumbs.db
