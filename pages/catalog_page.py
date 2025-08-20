@@ -9,19 +9,16 @@ from pages.product_page import ProductPage
 
 
 class CatalogPage(Base):
+    """ Класс для работы со страницей каталога """
     # Locators
 
     __filter_price_from = "//input[@id='amount-min']"
     __filter_price_to = "//input[@id='amount-max']"
     __all_filters_btn = "//a[contains(@class, 'show-extended')]"
     __filter_checkbox = ("//div[contains(@class,'mb-0 custom-control custom-checkbox  ')]//a[contains(text(), '{}')]")
-    __agree_cookies_btn = "//button[@class='btn btn-info mt-2']"
-    __product_cards = "//div[contains(@class, 'justify-content-md-start') or .//div[@id='productContainer']]//div[@class='px-2 py-3 item-wrap']"
+    __product_cards = "//div[@id='ajax_cont']//div[@class='px-2 py-3 item-wrap']"
 
     # Getters
-
-    def __get_agree_cookies_btn(self):
-        return WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, self.__agree_cookies_btn)))
 
     def __get_filter_price_from(self):
         return WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, self.__filter_price_from)))
@@ -39,62 +36,83 @@ class CatalogPage(Base):
         return WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
 
     def __get_product_cards(self):
+        # Ждем появления хотя бы одной карточки
+        # WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, self.__product_cards)))
         return self.driver.find_elements(By.XPATH, self.__product_cards)
 
     # Actions
 
-    def __agree_cookies(self):
-        self._click_element(self.__get_agree_cookies_btn())
-        print("agree cookies")
-
     def __clear_filter_price_from(self):
-        self._clear_input(self.__get_filter_price_from())
-        print("Clear price from")
+        try:
+            self._clear_input(self.__get_filter_price_from())
+            self.logger.debug("Очистка поля 'Цена от' выполнена")
+        except Exception as e:
+            self.logger.error(f"Ошибка при очистке поля 'Цена от': {str(e)}")
+            raise
 
     def __input_filter_price_from(self, value):
-        self._input(self.__get_filter_price_from(), value)
-        print(f"Set price from {value}")
+        try:
+            self._input(self.__get_filter_price_from(), value)
+            self.logger.info(f"Установка значения 'Цена от': {value}")
+        except Exception as e:
+            self.logger.error(f"Ошибка при установке значения 'Цена от': {str(e)}")
+            raise
 
     def __clear_filter_price_to(self):
-        self._clear_input(self.__get_filter_price_to())
-        print("Clear price to")
+        try:
+            self._clear_input(self.__get_filter_price_to())
+            self.logger.debug("Очистка поля 'Цена до' выполнена")
+        except Exception as e:
+            self.logger.error(f"Ошибка при очистке поля 'Цена до': {str(e)}")
+            raise
 
     def __input_filter_price_to(self, value):
-        self._input(self.__get_filter_price_to(), value)
-        print(f"Set price to {value}")
+        try:
+            self._input(self.__get_filter_price_to(), value)
+            self.logger.info(f"Установка значения 'Цена до': {value}")
+        except Exception as e:
+            self.logger.error(f"Ошибка при установке значения 'Цена до': {str(e)}")
+            raise
 
     def __click_checkbox(self, value):
-        self._click_element(self.__get_filter_checkbox(value))
-        print(f"Filter '{value}' is selected")
+        try:
+            self._click_element(self.__get_filter_checkbox(value))
+            self.logger.info(f"Выбран фильтр: '{value}'")
+        except Exception as e:
+            self.logger.error(f"Ошибка при выборе фильтра '{value}': {str(e)}")
+            raise
 
     def __expand_filter(self):
-        """Раскрывает список фильтра"""
+        """ Метод для раскрытия списков фильтров """
         try:
-            # Находим кнопку "Все" для раскрытия списка
             expand_button = self.__get_all_filters_btn()
-
-            # Проверяем, не раскрыт ли уже список
             for btn in expand_button:
                 if btn.text == "показать ещё":
                     self._click_element(btn)
-
         except Exception as e:
-            print(f"Не удалось раскрыть фильтр: {str(e)}")
-            raise
+            error_msg = f"Не удалось раскрыть фильтр: {str(e)}"
+            self.logger.error(error_msg)
+            raise Exception(error_msg)
 
     def choose_random_product(self):
-        product_cards = self.__get_product_cards()
-        product = random.choice(product_cards)
-        t = product.find_element(By.CLASS_NAME, "title")
-        print(f"Select product: {t.text}")
-        product_link = product.find_element(By.CLASS_NAME, "img-link")
-        product_url = product_link.get_attribute("href")
-        return ProductPage(self.driver, product_url)
+        """ Метод выбора случайного товара на странице """
+        try:
+            product_cards = self.__get_product_cards()
+            product = random.choice(product_cards)
+            t = product.find_element(By.CLASS_NAME, "title")
+            product_name = t.text
+            product_link = product.find_element(By.CLASS_NAME, "img-link")
+            product_url = product_link.get_attribute("href")
+
+            self.logger.info(f"Выбран товар: '{product_name}' (URL: {product_url})")
+            return ProductPage(self.driver, product_url)
+        except Exception as e:
+            self.logger.error(f"Ошибка при выборе случайного товара: {str(e)}")
+            raise
 
     # Methods
     def install_filters(self, list_filters, price_from=None, price_to=None):
-        self._get_current_url()
-        self.__agree_cookies()
+        """ Метод для установки фильтров """
         if price_from is not None:
             self.__clear_filter_price_from()
             self.__input_filter_price_from(price_from)
@@ -104,4 +122,6 @@ class CatalogPage(Base):
         self.__expand_filter()
         for filter in list_filters:
             self.__click_checkbox(filter)
-        time.sleep(5)
+
+        # Временная задержка для применения фильтров и обновления товаров
+        time.sleep(3)

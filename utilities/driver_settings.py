@@ -1,19 +1,34 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+
+from utilities.logger import setup_logger
 
 
 class Settings:
-    @staticmethod
-    def set_settings(url):
-        options = webdriver.ChromeOptions()  # возможность добавлять дополнительные настройки для браузера
-        options.add_experimental_option('detach', True)  # опция, которая не позволит нашему браузеру закрыться
-        options.add_argument("--guest")  # опция, которая отключает оповещения от Браузера, с просьбой смены пароля
-        options.add_argument('--ignore-certificate-errors')
-        options.add_argument('--ignore-ssl-errors')
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        # options.add_argument("--headless")
-        service = Service(executable_path="C:/Users/User/PycharmProjects/SeleniunProject/chromedriver.exe")
-        driver = webdriver.Chrome(service=service, options=options)
-        driver.get(url)
-        driver.maximize_window()
-        return driver
+	@staticmethod
+	def set_settings(url):
+		options = webdriver.ChromeOptions()
+
+		# Настройки ChromeOptions
+		chrome_options = [
+			'--guest',
+			'--ignore-certificate-errors',
+			'--ignore-ssl-errors',
+			'--start-maximized',
+			'--disable-notifications'
+		]
+
+		for option in chrome_options:
+			options.add_argument(option)
+
+		options.add_experimental_option('detach', True)
+		options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+		service = Service(ChromeDriverManager().install())
+
+		driver = webdriver.Chrome(service=service, options=options)
+		driver.get(url)
+		logger = setup_logger("Settings")
+		logger.info(f"Открыта страница: {url}")
+		return driver

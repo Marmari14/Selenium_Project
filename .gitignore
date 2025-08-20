@@ -1,11 +1,7 @@
 ﻿# Virtual environment
 .venv/
 venv/
-env/
-
-# IDE (PyCharm)
-.idea/
-*.iml
+env
 
 # Python cache
 __pycache__/

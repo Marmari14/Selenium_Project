@@ -6,6 +6,7 @@ from base.base_page import Base
 
 
 class CartPage(Base):
+    """ Класс для работы со страницей корзины """
     # Locators
 
     __product_price = "//span[contains(@id, 'summa')]"
@@ -21,11 +22,31 @@ class CartPage(Base):
 
     # Methods
     def compare_prices(self, catalog_price):
-        cart_price = self.__get_product_price()
-        cart_price_text = cart_price.text
-        assert float(cart_price_text.replace(" ", "")) == catalog_price, "The price in the catalog and in the shopping cart do not match"
-        print("The price in the catalog and in the shopping cart are the same")
+        """ Метод для сравнения цены товара в каталоге и в корзине """
+        try:
+            cart_price = self.__get_product_price()
+            cart_price_text = cart_price.text
+            cart_price_value = float(cart_price_text.replace(" ", ""))
+
+            self.logger.info(f"Сравнение цен: каталог={catalog_price}, корзина={cart_price_value}")
+
+            assert cart_price_value == catalog_price, \
+                f"Цена в каталоге ({catalog_price}) и корзине ({cart_price_value}) не совпадает"
+
+            self.logger.info("Цены в каталоге и корзине совпадают")
+
+        except AssertionError as ae:
+            self.logger.error(f"Ошибка сравнения цен: {str(ae)}")
+            raise
+        except Exception as ex:
+            self.logger.error(f"Неожиданная ошибка при сравнении цен: {str(ex)}")
+            raise
 
     def click_checkout_btn(self):
-        self._click_element(self.__get_checkout_btn())
-        print("Going to checkout")
+        """ Метод для перехода к оформлению товара """
+        try:
+            self._click_element(self.__get_checkout_btn())
+            self.logger.info(f"Переход к оформлению заказа | URL {self._get_current_url()}")
+        except Exception as ex:
+            self.logger.error(f"Ошибка перехода к оформлению заказа: {str(ex)}")
+            raise
