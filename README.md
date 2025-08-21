@@ -14,11 +14,11 @@
 -	Google Chrome (проект использует ChromeDriverManager для автоматического скачивания драйвера)
 
 Все зависимости перечислены в _requirements.txt_. Основные библиотеки: _selenium_ для управления браузером, _pytest_ для тестирования, _faker_ для генерации тестовых данных.
-## Установка
+## Установка через Git Bash
 Создайте и активируйте виртуальное окружение, затем установите зависимости:
 ```
 py -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/Scripts/activate
 python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
