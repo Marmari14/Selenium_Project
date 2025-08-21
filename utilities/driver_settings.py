@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
+import chromedriver_autoinstaller
 from utilities.logger import setup_logger
 
 
@@ -25,7 +24,7 @@ class Settings:
 		options.add_experimental_option('detach', True)
 		options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-		service = Service(ChromeDriverManager().install())
+		service = Service(chromedriver_autoinstaller.install())
 
 		driver = webdriver.Chrome(service=service, options=options)
 		driver.get(url)
