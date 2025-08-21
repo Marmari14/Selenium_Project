@@ -17,9 +17,9 @@
 ## Установка
 Создайте и активируйте виртуальное окружение, затем установите зависимости:
 ```
-python -m venv venv
+py -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install --upgrade pip
+python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 ## Запуск тестов
